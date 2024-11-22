@@ -1,0 +1,24 @@
+{
+  "name": "michaeldrennen/yahoo-finance",
+  "description": "A PHP library to access Yahoo Finance data.",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "MichaelDrennen\\YahooFinance\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Michael Drennen",
+      "email": "michaeldrennen74@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "chrome-php/chrome": "^1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11"
+  }
+}
