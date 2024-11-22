@@ -82,6 +82,34 @@ trait ProfileTrait {
     /**
      * @param string $ticker
      *
+     * @return array
+     * @throws \HeadlessChromium\Exception\CommunicationException
+     * @throws \HeadlessChromium\Exception\CommunicationException\CannotReadResponse
+     * @throws \HeadlessChromium\Exception\CommunicationException\InvalidResponse
+     * @throws \HeadlessChromium\Exception\CommunicationException\ResponseHasError
+     * @throws \HeadlessChromium\Exception\JavascriptException
+     * @throws \HeadlessChromium\Exception\NavigationExpired
+     * @throws \HeadlessChromium\Exception\NoResponseAvailable
+     * @throws \HeadlessChromium\Exception\OperationTimedOut
+     */
+    public function getCompleteProfile( string $ticker ): array {
+        return [
+            'sector'               => $this->getSector( $ticker ),
+            'industry'             => $this->getIndustry( $ticker ),
+            'numFullTimeEmployees' => $this->getFullTimeEmployees( $ticker ),
+            'name'                 => $this->getCompanyName( $ticker ),
+            'address'              => $this->getCompanyAddress( $ticker ),
+            'telephone'            => $this->getCompanyTelephoneNumber( $ticker ),
+            'website'              => $this->getCompanyWebsite( $ticker ),
+            'description'          => $this->getCompanyDescription( $ticker ),
+            'keyExecutives'        => $this->getKeyExecutives( $ticker ),
+        ];
+    }
+
+
+    /**
+     * @param string $ticker
+     *
      * @return string
      * @throws \HeadlessChromium\Exception\CommunicationException
      * @throws \HeadlessChromium\Exception\CommunicationException\CannotReadResponse
@@ -288,17 +316,17 @@ trait ProfileTrait {
         $trs        = $xpath->query( $expression );
         foreach ( $trs as $tr ):
             $tds       = $tr->getElementsByTagName( 'td' );
-            $name      = trim($tds->item( 0 )->textContent);
-            $title     = trim($tds->item( 1 )->textContent);
-            $pay       = trim($tds->item( 2 )->textContent);
-            $exercised = trim($tds->item( 3 )->textContent);
-            $birthYear = trim($tds->item( 4 )->textContent);
+            $name      = trim( $tds->item( 0 )->textContent );
+            $title     = trim( $tds->item( 1 )->textContent );
+            $pay       = trim( $tds->item( 2 )->textContent );
+            $exercised = trim( $tds->item( 3 )->textContent );
+            $birthYear = trim( $tds->item( 4 )->textContent );
             $execs[]   = [
-                'name'      => str_replace('  ', ' ', $name),
+                'name'      => str_replace( '  ', ' ', $name ),
                 'title'     => $title,
-                'pay'       => '--' == $pay ? null : $pay,
-                'exercised' => '--' == $exercised ? null : $exercised,
-                'birthYear' => '--' == $birthYear ? null : $birthYear,
+                'pay'       => '--' == $pay ? NULL : $pay,
+                'exercised' => '--' == $exercised ? NULL : $exercised,
+                'birthYear' => '--' == $birthYear ? NULL : $birthYear,
             ];
         endforeach;
 

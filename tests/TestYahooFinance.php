@@ -105,4 +105,13 @@ class TestYahooFinance extends \PHPUnit\Framework\TestCase {
         $this->assertEquals( 'Mr. Corrado F. De Gasperis', $keyExecs[ 0 ][ 'name' ] );
     }
 
+
+    /**
+     * @test
+     * @group profile
+     */
+    public function testGetCompleteProfile() {
+        $profile = self::$yahooFinance->getCompleteProfile( 'LODE' );
+        $this->assertNotEmpty( $profile );
+    }
 }
