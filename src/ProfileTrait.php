@@ -35,6 +35,10 @@ trait ProfileTrait {
         $this->page->navigate( $url )->waitForNavigation();
         $html = $this->page->getHtml();
 
+        if( str_contains( $html, 'Symbols similar to' ) ):
+            throw new \Exception("The ticker " . $ticker . " was not found on Yahoo.");
+        endif;
+
         $dom = new \DOMDocument();
         @$dom->loadHTML( $html );
         $this->domsByTicker[ $ticker ] = $dom;
