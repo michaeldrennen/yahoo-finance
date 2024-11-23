@@ -75,7 +75,7 @@ trait ProfileTrait {
             return trim( $dt->nextElementSibling->nodeValue );
         endforeach;
 
-        throw new \Exception( "Parser did not find a <dt> element with text content of '" . strtolower( $label ) . "'" );
+        throw new \Exception( "Parser did not find a <dt> element with text content of '" . strtolower( $label ) . "' for ticker " . $ticker );
     }
 
 
