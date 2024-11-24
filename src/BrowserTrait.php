@@ -34,21 +34,25 @@ trait BrowserTrait {
      * @throws \HeadlessChromium\Exception\NoResponseAvailable
      * @throws \HeadlessChromium\Exception\OperationTimedOut
      */
-    protected function _constructBrowser( string $chromePath ): void {
+    protected function _constructBrowser( string $chromePath, bool $debug = FALSE ): void {
         $this->cookies    = new CookiesCollection();
         $this->chromePath = $chromePath;
 
         $browserFactory = new BrowserFactory( $this->chromePath );
+
+        $options = [ 'headless'        => TRUE,         // disable headless mode
+                     'connectionDelay' => self::BROWSER_CONNECTION_DELAY,
+                     'windowSize'      => [ self::BROWSER_WINDOW_SIZE_WIDTH,
+                                            self::BROWSER_WINDOW_SIZE_HEIGHT ],
+                     'enableImages'    => self::BROWSER_ENABLE_IMAGES,
+                     'customFlags'     => [ '--disable-web-security' ] ];
+
+        if ( $debug ):
+            $options[ 'debugLogger' ] = 'php://stdout'; // will enable verbose mode
+        endif;
+
         // starts headless chrome
-        $this->browser = $browserFactory->createBrowser( [
-                                                             'headless'        => TRUE,         // disable headless mode
-                                                             'connectionDelay' => self::BROWSER_CONNECTION_DELAY,
-                                                             //'debugLogger'     => 'php://stdout', // will enable verbose mode
-                                                             'windowSize'      => [ self::BROWSER_WINDOW_SIZE_WIDTH,
-                                                                                    self::BROWSER_WINDOW_SIZE_HEIGHT ],
-                                                             'enableImages'    => self::BROWSER_ENABLE_IMAGES,
-                                                             'customFlags'     => [ '--disable-web-security' ],
-                                                         ] );
+        $this->browser = $browserFactory->createBrowser( $options );
 
         $this->createPage();
     }

@@ -9,15 +9,22 @@ class YahooFinance {
 
     const YAHOO_FINANCE_URL = 'https://finance.yahoo.com/';
 
-    public function __construct( string $chromePath ) {
-        $this->_constructBrowser( $chromePath );
+
+    /**
+     * @param string $chromePath
+     * @param bool $debug
+     * @throws \HeadlessChromium\Exception\CommunicationException
+     * @throws \HeadlessChromium\Exception\NoResponseAvailable
+     * @throws \HeadlessChromium\Exception\OperationTimedOut
+     */
+    public function __construct( string $chromePath, bool $debug = FALSE ) {
+        $this->_constructBrowser( $chromePath, $debug );
 
     }
 
     public function __destruct() {
         $this->_destroyBrowser();
     }
-
 
 
 }
