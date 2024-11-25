@@ -3,6 +3,8 @@
 namespace MichaelDrennen\YahooFinance;
 
 
+use Illuminate\Support\Facades\Storage;
+
 trait ProfileTrait {
     use BrowserTrait;
 
@@ -35,8 +37,8 @@ trait ProfileTrait {
         $this->page->navigate( $url )->waitForNavigation();
         $html = $this->page->getHtml();
 
-        if( str_contains( $html, 'Symbols similar to' ) ):
-            throw new \Exception("The ticker " . $ticker . " was not found on Yahoo.");
+        if ( str_contains( $html, 'Symbols similar to' ) ):
+            throw new \Exception( "The ticker " . $ticker . " was not found on Yahoo." );
         endif;
 
         $dom = new \DOMDocument();
@@ -60,6 +62,7 @@ trait ProfileTrait {
      * @throws \HeadlessChromium\Exception\NavigationExpired
      * @throws \HeadlessChromium\Exception\NoResponseAvailable
      * @throws \HeadlessChromium\Exception\OperationTimedOut
+     * @throws \MichaelDrennen\YahooFinance\ExceptionMissingDtElement
      */
     protected function _getValueAfterLabel( string $ticker, string $label ): mixed {
         $dom = $this->_getDom( $ticker );
@@ -79,7 +82,11 @@ trait ProfileTrait {
             return trim( $dt->nextElementSibling->nodeValue );
         endforeach;
 
-        throw new \Exception( "Parser did not find a <dt> element with text content of '" . strtolower( $label ) . "' for ticker " . $ticker );
+        throw new ExceptionMissingDtElement( "Parser did not find a <dt> element with text content of '" . strtolower( $label ) . "' for ticker " . $ticker,
+                                             0,
+                                             NULL,
+                                             $ticker,
+                                             $label );
     }
 
 
@@ -126,7 +133,11 @@ trait ProfileTrait {
      * @throws \Exception
      */
     public function getSector( string $ticker ): string {
-        return $this->_getValueAfterLabel( $ticker, 'sector' );
+        try {
+            return $this->_getValueAfterLabel( $ticker, 'sector' );
+        } catch ( ExceptionMissingDtElement $e ) {
+            // Sometimes the profile is missing a piece of data.
+        }
     }
 
 
@@ -144,7 +155,11 @@ trait ProfileTrait {
      * @throws \HeadlessChromium\Exception\OperationTimedOut
      */
     public function getIndustry( string $ticker ): string {
-        return $this->_getValueAfterLabel( $ticker, 'industry' );
+        try {
+            return $this->_getValueAfterLabel( $ticker, 'industry' );
+        } catch ( ExceptionMissingDtElement $e ) {
+            // Sometimes the profile is missing a piece of data.
+        }
     }
 
 
@@ -160,10 +175,15 @@ trait ProfileTrait {
      * @throws \HeadlessChromium\Exception\NavigationExpired
      * @throws \HeadlessChromium\Exception\NoResponseAvailable
      * @throws \HeadlessChromium\Exception\OperationTimedOut
+     * @throws \Exception
      */
     public function getFullTimeEmployees( string $ticker ): int {
-        $stringNumber = $this->_getValueAfterLabel( $ticker, 'Full Time Employees' );
-        return (int)str_replace( ',', '', $stringNumber );
+        try {
+            $stringNumber = $this->_getValueAfterLabel( $ticker, 'Full Time Employees' );
+            return (int)str_replace( ',', '', $stringNumber );
+        } catch ( ExceptionMissingDtElement $e ) {
+            // Sometimes the profile is missing a piece of data.
+        }
     }
 
 
@@ -226,13 +246,20 @@ trait ProfileTrait {
             $addressParts[] = trim( $node->textContent );
         endforeach;
 
-        $address[ 'street' ]  = trim( $addressParts[ 0 ] );
-        $cityParts            = explode( ',', $addressParts[ 1 ] );
-        $address[ 'city' ]    = $cityParts[ 0 ];
-        $stateParts           = explode( ' ', trim( $cityParts[ 1 ] ) );
-        $address[ 'state' ]   = trim( $stateParts[ 0 ] );
-        $address[ 'zip' ]     = trim( $stateParts[ 1 ] );
-        $address[ 'country' ] = trim( $addressParts[ 2 ] );
+        try {
+            $address[ 'street' ] = trim( $addressParts[ 0 ] );
+            $cityParts           = explode( ',', trim( $addressParts[ 1 ] ) );
+
+            $address[ 'city' ]    = $cityParts[ 0 ];
+            $stateParts           = explode( ' ', trim( $cityParts[ 1 ] ) );
+            $address[ 'state' ]   = trim( $stateParts[ 0 ] );
+            $address[ 'zip' ]     = trim( $stateParts[ 1 ] );
+            $address[ 'country' ] = trim( $addressParts[ 2 ] );
+        } catch ( \Exception $e ) {
+            Storage::put( '___' . md5( implode( '|', $addressParts ) . '.txt' ), implode( PHP_EOL, $addressParts ) );
+            dump( $addressParts );
+        }
+
 
         return $address;
     }
