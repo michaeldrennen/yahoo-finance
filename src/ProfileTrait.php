@@ -38,7 +38,7 @@ trait ProfileTrait {
         $html = $this->page->getHtml();
 
         if ( str_contains( $html, 'Symbols similar to' ) ):
-            throw new \Exception( "The ticker " . $ticker . " was not found on Yahoo." );
+            throw new ExceptionTickerNotFound( "The ticker " . $ticker . " was not found on Yahoo.", 0, NULL, $ticker );
         endif;
 
         $dom = new \DOMDocument();
@@ -177,12 +177,13 @@ trait ProfileTrait {
      * @throws \HeadlessChromium\Exception\OperationTimedOut
      * @throws \Exception
      */
-    public function getFullTimeEmployees( string $ticker ): int {
+    public function getFullTimeEmployees( string $ticker ): ?int {
         try {
             $stringNumber = $this->_getValueAfterLabel( $ticker, 'Full Time Employees' );
             return (int)str_replace( ',', '', $stringNumber );
         } catch ( ExceptionMissingDtElement $e ) {
             // Sometimes the profile is missing a piece of data.
+            return NULL;
         }
     }
 

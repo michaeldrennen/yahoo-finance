@@ -114,4 +114,16 @@ class TestYahooFinance extends \PHPUnit\Framework\TestCase {
         $profile = self::$yahooFinance->getCompleteProfile( 'LODE' );
         $this->assertNotEmpty( $profile );
     }
+
+
+    /**
+     * @test
+     * @group badticker
+     */
+    public function testGetTickerNotFoundOnYahoo(){
+        $this->expectException(\MichaelDrennen\YahooFinance\ExceptionTickerNotFound::class);
+        $tickerThatDoesNotExist = 'DLA';
+        self::$yahooFinance->getCompleteProfile( $tickerThatDoesNotExist );
+
+    }
 }
