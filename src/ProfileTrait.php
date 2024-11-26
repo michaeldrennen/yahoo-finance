@@ -137,6 +137,7 @@ trait ProfileTrait {
             return $this->_getValueAfterLabel( $ticker, 'sector' );
         } catch ( ExceptionMissingDtElement $e ) {
             // Sometimes the profile is missing a piece of data.
+            return '';
         }
     }
 
@@ -159,6 +160,7 @@ trait ProfileTrait {
             return $this->_getValueAfterLabel( $ticker, 'industry' );
         } catch ( ExceptionMissingDtElement $e ) {
             // Sometimes the profile is missing a piece of data.
+            return '';
         }
     }
 
