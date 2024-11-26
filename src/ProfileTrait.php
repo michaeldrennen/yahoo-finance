@@ -271,7 +271,7 @@ trait ProfileTrait {
     /**
      * @param string $ticker
      *
-     * @return string
+     * @return string|null
      * @throws \HeadlessChromium\Exception\CommunicationException
      * @throws \HeadlessChromium\Exception\CommunicationException\CannotReadResponse
      * @throws \HeadlessChromium\Exception\CommunicationException\InvalidResponse
@@ -281,14 +281,19 @@ trait ProfileTrait {
      * @throws \HeadlessChromium\Exception\NoResponseAvailable
      * @throws \HeadlessChromium\Exception\OperationTimedOut
      */
-    public function getCompanyTelephoneNumber( string $ticker ): string {
+    public function getCompanyTelephoneNumber( string $ticker ): ?string {
         $dom = $this->_getDom( $ticker );
 
         $xpath      = new \DOMXPath( $dom );
         $expression = "//div[contains(@class,'company-details')]/div/a[contains(@href,'tel')]";
         $nodes      = $xpath->query( $expression );
-        $href       = $nodes->item( 0 )->getAttribute( 'href' );
-        $telephone  = str_replace( 'tel:', '', $href );
+        $firstNode  = $nodes->item( 0 );
+        if ( is_null( $firstNode ) ):
+            //throw new ExceptionMissingElement( "Unable to find the telephone number.", 0, NULL, $ticker );
+            return NULL;
+        endif;
+        $href      = $firstNode->getAttribute( 'href' );
+        $telephone = str_replace( 'tel:', '', $href );
         return $telephone;
     }
 
