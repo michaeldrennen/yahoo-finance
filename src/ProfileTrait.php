@@ -40,7 +40,11 @@ trait ProfileTrait {
         $html = $this->page->getHtml();
 
         if ( str_contains( $html, 'Symbols similar to' ) ):
-            throw new ExceptionTickerNotFound( "The ticker " . $ticker . " was not found on Yahoo.", 0, NULL, $ticker );
+            throw new ExceptionTickerNotFound( "The ticker " . $ticker . " was not found on Yahoo.",
+                                               0,
+                                               NULL,
+                                               $ticker,
+                                               $html );
         endif;
 
         $dom = new \DOMDocument();
