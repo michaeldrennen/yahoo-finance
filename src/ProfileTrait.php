@@ -19,7 +19,7 @@ trait ProfileTrait {
     /**
      * @param string $ticker
      *
-     * @return string
+     * @return \DOMDocument
      * @throws \HeadlessChromium\Exception\CommunicationException
      * @throws \HeadlessChromium\Exception\CommunicationException\CannotReadResponse
      * @throws \HeadlessChromium\Exception\CommunicationException\InvalidResponse
@@ -28,6 +28,7 @@ trait ProfileTrait {
      * @throws \HeadlessChromium\Exception\NavigationExpired
      * @throws \HeadlessChromium\Exception\NoResponseAvailable
      * @throws \HeadlessChromium\Exception\OperationTimedOut
+     * @throws \MichaelDrennen\YahooFinance\ExceptionTickerNotFound
      */
     protected function _getDom( string $ticker ): \DOMDocument {
         if ( isset( $this->domsByTicker[ $ticker ] ) ):
@@ -445,12 +446,17 @@ trait ProfileTrait {
                 'country' => $COUNTRY,
             ];
         } catch ( \Exception $e ) {
-            throw new ExceptionUnparsedAddress("Address for $ticker was unable to be parsed.",
-                                               $e->getCode(),
-                                               $e,
-                                               $ticker,
-                                               $addressLines);
+            throw new ExceptionUnparsedAddress( "Address for $ticker was unable to be parsed.",
+                                                $e->getCode(),
+                                                $e,
+                                                $ticker,
+                                                $addressLines );
         }
     }
+
+    public function flushDomsByTickerCache(): void {
+        $this->domsByTicker = [];
+    }
+
 
 }
