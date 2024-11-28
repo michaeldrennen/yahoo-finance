@@ -4,6 +4,7 @@ namespace MichaelDrennen\YahooFinance;
 
 
 use Illuminate\Support\Facades\Storage;
+use function PHPUnit\Framework\isNull;
 
 trait ProfileTrait {
     use BrowserTrait;
@@ -261,6 +262,9 @@ trait ProfileTrait {
          */
         $addressParts = [];
         foreach ( $nodes as $node ):
+            if ( is_null( $node ) ):
+                continue;
+            endif;
             $addressParts[] = trim( $node->textContent );
         endforeach;
 
@@ -326,13 +330,17 @@ trait ProfileTrait {
      * @throws \HeadlessChromium\Exception\NoResponseAvailable
      * @throws \HeadlessChromium\Exception\OperationTimedOut
      */
-    public function getCompanyWebsite( string $ticker ): string {
+    public function getCompanyWebsite( string $ticker ): ?string {
         $dom = $this->_getDom( $ticker );
 
         $xpath      = new \DOMXPath( $dom );
         $expression = "//div[contains(@class,'company-details')]/div/a[contains(@data-ylk,'business-url')]";
         $nodes      = $xpath->query( $expression );
-        $href       = $nodes->item( 0 )->getAttribute( 'href' );
+        $firstNode  = $nodes->item( 0 );
+        if ( is_null( $firstNode ) ):
+            return NULL;
+        endif;
+        $href = $firstNode->getAttribute( 'href' );
         return $href;
     }
 
@@ -340,7 +348,7 @@ trait ProfileTrait {
     /**
      * @param string $ticker
      *
-     * @return string
+     * @return string|null
      * @throws \HeadlessChromium\Exception\CommunicationException
      * @throws \HeadlessChromium\Exception\CommunicationException\CannotReadResponse
      * @throws \HeadlessChromium\Exception\CommunicationException\InvalidResponse
@@ -350,13 +358,17 @@ trait ProfileTrait {
      * @throws \HeadlessChromium\Exception\NoResponseAvailable
      * @throws \HeadlessChromium\Exception\OperationTimedOut
      */
-    public function getCompanyDescription( string $ticker ): string {
+    public function getCompanyDescription( string $ticker ): ?string {
         $dom = $this->_getDom( $ticker );
 
         $xpath      = new \DOMXPath( $dom );
         $expression = "//section[@data-testid='description']/p";
         $nodes      = $xpath->query( $expression );
-        $desc       = trim( $nodes->item( 0 )->textContent );
+        $firstNode  = $nodes->item( 0 );
+        if ( isnull( $firstNode ) ):
+            return NULL;
+        endif;
+        $desc = trim( $nodes->item( 0 )->textContent );
         return $desc;
     }
 
