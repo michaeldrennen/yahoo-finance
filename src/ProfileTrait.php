@@ -237,12 +237,27 @@ trait ProfileTrait {
         $nodes      = $xpath->query( $expression );
 
         /**
-         * Below is an example of what will be held in $addressParts
-         * (
+         * Below are examples of what will be held in $addressParts:
+         *
          * [0] => 117 American Flat Road
          * [1] => Virginia City, NV 89440
          * [2] => United States
-         * )
+         *
+         * 0 => "616 N. North Court"
+         * 1 => "Suite 120"
+         * 2 => "Palatine, IL 60067"
+         * 3 => "United States"
+         *
+         * 0 => "China Yuangu Hanggang Technology Building"
+         * 1 => "509 Qianjiang Road Shangcheng District"
+         * 2 => "Hangzhou, 310000"
+         * 3 => "China"
+         *
+         * 0 => "A.S. Cooper Building"
+         * 1 => "Suite 601 26 Reid Street"
+         * 2 => "Hamilton, HM 11"
+         * 3 => "Bermuda"
+         *
          */
         $addressParts = [];
         foreach ( $nodes as $node ):
