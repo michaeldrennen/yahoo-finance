@@ -22,4 +22,11 @@ class ExceptionUnparsedAddress extends \Exception {
         $this->ticker       = $ticker;
         $this->addressLines = $addressLines;
     }
+
+    /**
+     * @return array
+     */
+    public function getAddressLines() {
+        return $this->addressLines;
+    }
 }
