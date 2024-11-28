@@ -399,13 +399,23 @@ trait ProfileTrait {
      * @throws \MichaelDrennen\YahooFinance\ExceptionUnparsedAddress
      */
     public static function getAddressFromAddressLines( array $addressLines, string $ticker ): array {
-
         $STREET     = NULL;
         $UNIT       = NULL;
         $CITY       = NULL;
         $STATE      = NULL;
         $POSTALCODE = NULL;
         $COUNTRY    = NULL;
+
+        if( empty($addressLines) ):
+            return [
+                'street'  => $STREET,
+                'unit'    => $UNIT,
+                'city'    => $CITY,
+                'state'   => $STATE,
+                'zip'     => $POSTALCODE,
+                'country' => $COUNTRY,
+            ];
+        endif;
 
         try {
             // The country will always be the last line... I think.
