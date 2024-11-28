@@ -365,7 +365,7 @@ trait ProfileTrait {
         $expression = "//section[@data-testid='description']/p";
         $nodes      = $xpath->query( $expression );
         $firstNode  = $nodes->item( 0 );
-        if ( isnull( $firstNode ) ):
+        if ( is_null( $firstNode ) ):
             return NULL;
         endif;
         $desc = trim( $nodes->item( 0 )->textContent );
