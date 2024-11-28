@@ -237,29 +237,7 @@ trait ProfileTrait {
         $expression = "//div[contains(@class,'company-details')]/div[contains(@class,'company-info')]/div[contains(@class,'address')]/div";
         $nodes      = $xpath->query( $expression );
 
-        /**
-         * Below are examples of what will be held in $addressParts:
-         *
-         * [0] => 117 American Flat Road
-         * [1] => Virginia City, NV 89440
-         * [2] => United States
-         *
-         * 0 => "616 N. North Court"
-         * 1 => "Suite 120"
-         * 2 => "Palatine, IL 60067"
-         * 3 => "United States"
-         *
-         * 0 => "China Yuangu Hanggang Technology Building"
-         * 1 => "509 Qianjiang Road Shangcheng District"
-         * 2 => "Hangzhou, 310000"
-         * 3 => "China"
-         *
-         * 0 => "A.S. Cooper Building"
-         * 1 => "Suite 601 26 Reid Street"
-         * 2 => "Hamilton, HM 11"
-         * 3 => "Bermuda"
-         *
-         */
+
         $addressParts = [];
         foreach ( $nodes as $node ):
             if ( is_null( $node ) ):
@@ -268,19 +246,7 @@ trait ProfileTrait {
             $addressParts[] = trim( $node->textContent );
         endforeach;
 
-        try {
-            $address[ 'street' ] = trim( $addressParts[ 0 ] );
-            $cityParts           = explode( ',', trim( $addressParts[ 1 ] ) );
-
-            $address[ 'city' ]    = $cityParts[ 0 ];
-            $stateParts           = explode( ' ', trim( $cityParts[ 1 ] ) );
-            $address[ 'state' ]   = trim( $stateParts[ 0 ] );
-            $address[ 'zip' ]     = trim( $stateParts[ 1 ] );
-            $address[ 'country' ] = trim( $addressParts[ 2 ] );
-        } catch ( \Exception $e ) {
-            Storage::put( '___' . md5( implode( '|', $addressParts ) . '.txt' ), implode( PHP_EOL, $addressParts ) );
-            dump( $addressParts );
-        }
+        $address = self::getAddressFromAddressLines( $addressParts, $ticker );
 
 
         return $address;
@@ -398,4 +364,93 @@ trait ProfileTrait {
 
         return $execs;
     }
+
+
+    /**
+     * Below are examples of what will be held in $addressParts:
+     *
+     * [0] => 117 American Flat Road
+     * [1] => Virginia City, NV 89440
+     * [2] => United States
+     *
+     * 0 => "616 N. North Court"
+     * 1 => "Suite 120"
+     * 2 => "Palatine, IL 60067"
+     * 3 => "United States"
+     *
+     * 0 => "China Yuangu Hanggang Technology Building"
+     * 1 => "509 Qianjiang Road Shangcheng District"
+     * 2 => "Hangzhou, 310000"
+     * 3 => "China"
+     *
+     * 0 => "A.S. Cooper Building"
+     * 1 => "Suite 601 26 Reid Street"
+     * 2 => "Hamilton, HM 11"
+     * 3 => "Bermuda"
+     *
+     */
+
+    /**
+     * @param array  $addressLines
+     * @param string $ticker
+     *
+     * @return array
+     * @throws \MichaelDrennen\YahooFinance\ExceptionUnparsedAddress
+     */
+    public static function getAddressFromAddressLines( array $addressLines, string $ticker ): array {
+
+        $STREET     = NULL;
+        $UNIT       = NULL;
+        $CITY       = NULL;
+        $STATE      = NULL;
+        $POSTALCODE = NULL;
+        $COUNTRY    = NULL;
+
+        try {
+            // The country will always be the last line... I think.
+            $COUNTRY = array_pop( $addressLines );
+
+            $lineWithPostalCode = array_pop( $addressLines );
+
+            $regexPostalCode = '/\d+$/';
+            preg_match( $regexPostalCode, $lineWithPostalCode, $matches );
+            $POSTALCODE            = $matches[ 0 ];
+            $lineWithoutPostalCode = preg_replace( $regexPostalCode,
+                                                   '',
+                                                   $lineWithPostalCode );
+
+            $remainingPartsOfPostalCodeLine = explode( ',', $lineWithoutPostalCode );
+            $remainingPartsOfPostalCodeLine = array_map( 'trim', $remainingPartsOfPostalCodeLine );
+
+
+            $CITY  = array_shift( $remainingPartsOfPostalCodeLine );
+            $STATE = array_shift( $remainingPartsOfPostalCodeLine );
+
+            // Only a street address. No building.
+            if ( 1 == count( $addressLines ) ):
+                $STREET = array_pop( $addressLines );
+            elseif ( 2 == count( $addressLines ) ):
+                $UNIT   = array_pop( $addressLines );
+                $STREET = array_pop( $addressLines );
+            else:
+                throw new \Exception( "What the hell kinda address was this?" );
+            endif;
+
+            return [
+                'street'  => $STREET,
+                'unit'    => $UNIT,
+                'city'    => $CITY,
+                'state'   => $STATE,
+                'zip'     => $POSTALCODE,
+                'country' => $COUNTRY,
+            ];
+        } catch ( \Exception $e ) {
+            throw new ExceptionUnparsedAddress("Address for $ticker was unable to be parsed.",
+                                               $e->getCode(),
+                                               $e,
+                                               $ticker,
+                                               $addressLines);
+        }
+    }
+
 }
