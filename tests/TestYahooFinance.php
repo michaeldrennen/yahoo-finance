@@ -8,7 +8,9 @@ class TestYahooFinance extends \PHPUnit\Framework\TestCase {
     protected static \MichaelDrennen\YahooFinance\YahooFinance $yahooFinance;
 
     public static function setUpBeforeClass(): void {
-        self::$yahooFinance = new YahooFinance( $_ENV[ 'CHROME_PATH' ] );
+        self::$yahooFinance = new YahooFinance( $_ENV[ 'CHROME_PATH' ],
+                                                $_ENV[ 'CHROME_PATH' ],
+                                                FALSE );
     }
 
 
@@ -120,8 +122,8 @@ class TestYahooFinance extends \PHPUnit\Framework\TestCase {
      * @test
      * @group badticker
      */
-    public function testGetTickerNotFoundOnYahoo(){
-        $this->expectException(\MichaelDrennen\YahooFinance\ExceptionTickerNotFound::class);
+    public function testGetTickerNotFoundOnYahoo() {
+        $this->expectException( \MichaelDrennen\YahooFinance\ExceptionTickerNotFound::class );
         $tickerThatDoesNotExist = 'DLA';
         self::$yahooFinance->getCompleteProfile( $tickerThatDoesNotExist );
 

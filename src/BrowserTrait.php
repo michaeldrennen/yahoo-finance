@@ -28,19 +28,22 @@ trait BrowserTrait {
 
     /**
      * @param string $chromePath
+     * @param string $userDataDirPath
+     * @param bool   $debug
      *
      * @return void
      * @throws \HeadlessChromium\Exception\CommunicationException
      * @throws \HeadlessChromium\Exception\NoResponseAvailable
      * @throws \HeadlessChromium\Exception\OperationTimedOut
      */
-    protected function _constructBrowser( string $chromePath, bool $debug = FALSE ): void {
+    protected function _constructBrowser( string $chromePath, string $userDataDirPath = '.', bool $debug = FALSE ): void {
         $this->cookies    = new CookiesCollection();
         $this->chromePath = $chromePath;
 
         $browserFactory = new BrowserFactory( $this->chromePath );
 
         $options = [ 'headless'        => TRUE,         // disable headless mode
+                     'userDataDir'     => $userDataDirPath,
                      'connectionDelay' => self::BROWSER_CONNECTION_DELAY,
                      'windowSize'      => [ self::BROWSER_WINDOW_SIZE_WIDTH,
                                             self::BROWSER_WINDOW_SIZE_HEIGHT ],

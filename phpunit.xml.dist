@@ -20,5 +20,6 @@
     <logging/>
     <php>
         <env name="CHROME_PATH" value="/path/to/chromium"/>
+        <env name="USER_DATA_DIR" value="/users/data/dir"/>
     </php>
 </phpunit>
