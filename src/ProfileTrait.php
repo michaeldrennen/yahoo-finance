@@ -2,8 +2,6 @@
 
 namespace MichaelDrennen\YahooFinance;
 
-
-use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\isNull;
 
 trait ProfileTrait {
