@@ -42,7 +42,7 @@ class TestYahooFinance extends \PHPUnit\Framework\TestCase {
      */
     public function testGetFullTimeEmployees() {
         $numFullTimeEmployees = self::$yahooFinance->getFullTimeEmployees( 'AAPL' );
-        $this->assertEquals( 164000, $numFullTimeEmployees );
+        $this->assertEquals( 166000, $numFullTimeEmployees );
     }
 
 
@@ -93,7 +93,7 @@ class TestYahooFinance extends \PHPUnit\Framework\TestCase {
      */
     public function testGetCompanyDescription() {
         $desc = self::$yahooFinance->getCompanyDescription( 'LODE' );
-        $this->assertTrue( str_contains( $desc, 'Comstock Inc. engages in the systemic decarbonization business' ) );
+        $this->assertTrue( str_contains( $desc, 'Comstock Inc. commercializes technologies, systems, and supply chains that extract, process, and convert under-utilized waste and natural resources into clean energy and clean energy supporting products in the United States. It operates through the Fuels, Metals, Mining, and Strategic Investments segments. The company develops and commercializes technology that extracts and converts wasted and unused lignocellulosic biomass into intermediates for refining into advanced renewable fuels. It also owns 100% in the Lucerne Project located in the Storey County, Nevada; and the Spring Valley Project situated in the Lyon County, Nevada. In addition, the company offers engineering and construction services; and invests in non-mining real estate, water rights, and securities investments. Comstock Inc. company was incorporated in 1999 and is based in Virginia City, Nevada.' ) );
     }
 
 
