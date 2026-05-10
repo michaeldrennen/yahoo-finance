@@ -19,7 +19,7 @@
     </testsuites>
     <logging/>
     <php>
-        <env name="CHROME_PATH" value="/path/to/chromium"/>
-        <env name="USER_DATA_DIR" value="/users/data/dir"/>
+        <env name="CHROME_PATH" value="/opt/homebrew/bin/chromium"/>
+        <env name="USER_DATA_DIR" value="/Users/michaeldrennen/Documents/PERSONAL/GITHUB/YahooFinance/tests/userDataDir"/>
     </php>
 </phpunit>
