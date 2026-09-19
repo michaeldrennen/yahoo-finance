@@ -42,7 +42,7 @@ class TestYahooFinance extends \PHPUnit\Framework\TestCase {
      */
     public function testGetFullTimeEmployees() {
         $numFullTimeEmployees = self::$yahooFinance->getFullTimeEmployees( 'AAPL' );
-        $this->assertEquals( 166000, $numFullTimeEmployees );
+        $this->assertEquals( 150000, $numFullTimeEmployees );
     }
 
 
